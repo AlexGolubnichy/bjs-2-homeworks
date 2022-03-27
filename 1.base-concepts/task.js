@@ -5,12 +5,13 @@ function solveEquation(a, b, c) {
       let arr = {};
       let D = Math.sqrt(b) - 4 * a * c;
       console.log( 'D = ' + D );
-      if( D < 0 ) 
+      if( D < 0 ) {
         return false;
+      }
       arr['discriminant'] = D;
-      if( D == 0 ) 
+      if( D == 0 ) {
         arr["quadratic roots"] = (-b + Math.sqrt(D)) / (2 * a);
-      else if( D > 0 ) {
+      } else if( D > 0 ) {
         let tmp = [];
         tmp.push((-b + Math.sqrt(D)) / (2 * a));
         tmp.push((-b - Math.sqrt(D)) / (2 * a));

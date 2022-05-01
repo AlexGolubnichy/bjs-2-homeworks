@@ -5,23 +5,24 @@ function cachingDecoratorNew(func) {
   function wrapper(...rest) {
     let hash = rest.join(',');
     let existResult = cache.filter(cacheRecord => cacheRecord.hash === hash);
-    if (existResult.length === 1) {
-        console.log('Из кэша: ' + existResult[0].value);
-        return 'Из кэша: ' + existResult[0].value;
+    
+    if (existResult) {
+        console.log('Из кэша: ' + existResult.value);
+        return 'Из кэша: ' + existResult.value;
     } 
-    else {
-      let value = func.call(this, ...rest);
-      console.log('Вычисляем: ' + value);
-      if (cache.length < 5) {   
-        cache.push({hash, value});
-      } 
-      else {
-        cache.unshift({hash, value});
-        cache.pop();
-      } 
+
+    let value = func.call(this, ...rest);
+    console.log('Вычисляем: ' + value)
+
+    cash.push({hash, value});
+
+    if (cache.length > 5) {
+      cache.shift()
+    }
+
       return 'Вычисляем: ' + value;
     }
-  }
+  
   return wrapper;
 }
 
@@ -29,25 +30,50 @@ function cachingDecoratorNew(func) {
 function debounceDecoratorNew(func, ms) {
   // Ваш код
   let timeout;
-  func(...rest);
-  let flag = true;
+  let firstCall = true;
+
+  
   return function (...rest) {
+    if (firstCall) {
+      func.call(this, ...rest);
+      firstCall = false;
+      return
+  }
+
     clearTimeout(timeout);
+
     timeout = setTimeout(() => {
       if (!flag) {
         func.call(this, ...rest); 
-        flag = true;
+        firstCall = true;
       }
     }, ms);
   }; 
 }
 //Задача 3. Усовершенствуйте debounceDecoratorNew
-function debounceDecorator2(debounceDecoratorNew) {
+function debounceDecorator2(func, ms) {
   // Ваш код
-  let count = 0;
+  let timeout;
+  let firstCall = true;
+
   function wrapper(...rest) {
-    wrapper.history = count++;
-    return debounceDecoratorNew.call(this, ...rest);
-  }
+    if (firstCall) {
+      func.call(this, ...rest);
+      firstCall = false;
+      wrapper.count++;
+      return
+    }
+
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+      func.call(this, ...rest);
+      firstCall = true;
+      wrapper.count++;
+    }, ms);
+  };
+
+  wrapper.count = 0;
+
   return wrapper;
 }
